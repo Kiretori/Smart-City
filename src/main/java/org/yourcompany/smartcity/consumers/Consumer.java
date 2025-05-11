@@ -10,7 +10,13 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
-public class WaterConsumer implements Runnable{
+public class Consumer implements Runnable{
+
+    protected String topic;
+
+    public Consumer(String topic) {
+        this.topic = topic;
+    }
 
     @Override
     public void run() {
@@ -28,7 +34,7 @@ public class WaterConsumer implements Runnable{
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
 
         // Subscribe to the topic
-        consumer.subscribe(Collections.singletonList("test-water"));
+        consumer.subscribe(Collections.singletonList(topic));
 
         // Poll for new messages
         System.out.println("Waiting for messages...");

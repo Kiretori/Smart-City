@@ -28,7 +28,7 @@ public class TrafficProducer extends BaseProducer implements Runnable {
 
     @Override
     protected String getTopic() {
-        return "test-energy";
+        return "test-traffic";
     }
 
     @Override

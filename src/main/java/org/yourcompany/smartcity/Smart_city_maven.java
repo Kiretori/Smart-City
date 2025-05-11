@@ -6,7 +6,10 @@ package org.yourcompany.smartcity;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yourcompany.smartcity.consumers.WaterConsumer;
+import org.yourcompany.smartcity.consumers.Consumer;
+import org.yourcompany.smartcity.producers.EnergyProducer;
+import org.yourcompany.smartcity.producers.TrafficProducer;
+import org.yourcompany.smartcity.producers.WasteBinProducer;
 import org.yourcompany.smartcity.producers.WaterProducer;
 
 /**
@@ -35,9 +38,31 @@ public class Smart_city_maven {
                     }
                 }
 
-                List<Thread> producerThreads = new ArrayList<>();  
+                List<Thread> producerThreads = new ArrayList<>(); 
+                // Water sensors 
                 for (int i = 0; i < threadNum; i++) {
                     Thread producerThread = new Thread(new WaterProducer());
+                    producerThreads.add(producerThread);
+                    producerThread.start();
+                }
+                
+                // Energy sensors
+                for (int i = 0; i < threadNum; i++) {
+                    Thread producerThread = new Thread(new EnergyProducer());
+                    producerThreads.add(producerThread);
+                    producerThread.start();
+                }
+
+                // Waste bin sensors
+                for (int i = 0; i < threadNum; i++) {
+                    Thread producerThread = new Thread(new WasteBinProducer());
+                    producerThreads.add(producerThread);
+                    producerThread.start();
+                }
+
+                // Traffic sensors
+                for (int i = 0; i < threadNum; i++) {
+                    Thread producerThread = new Thread(new TrafficProducer());
                     producerThreads.add(producerThread);
                     producerThread.start();
                 }
@@ -53,7 +78,7 @@ public class Smart_city_maven {
             }
             case "client" -> {
                 System.out.println("Running as client");
-                Thread consumerThread = new Thread(new WaterConsumer());
+                Thread consumerThread = new Thread(new Consumer("test-energy"));
                 consumerThread.start();
                  try {
                     consumerThread.join();
