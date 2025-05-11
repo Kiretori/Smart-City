@@ -28,7 +28,7 @@ public class WaterConsumer implements Runnable{
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
 
         // Subscribe to the topic
-        consumer.subscribe(Collections.singletonList("test"));
+        consumer.subscribe(Collections.singletonList("test-water"));
 
         // Poll for new messages
         System.out.println("Waiting for messages...");
