@@ -1,4 +1,4 @@
-package org.yourcompany.smartcity.consumers;
+package dev.kiretori.smartcity.consumers;
 
 
 import java.time.Duration;

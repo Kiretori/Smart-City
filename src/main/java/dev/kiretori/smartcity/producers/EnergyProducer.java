@@ -1,4 +1,4 @@
-package org.yourcompany.smartcity.producers;
+package dev.kiretori.smartcity.producers;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

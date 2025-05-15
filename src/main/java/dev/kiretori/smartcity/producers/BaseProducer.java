@@ -1,4 +1,4 @@
-package org.yourcompany.smartcity.producers;
+package dev.kiretori.smartcity.producers;
 
 import java.util.Map;
 import java.util.Properties;

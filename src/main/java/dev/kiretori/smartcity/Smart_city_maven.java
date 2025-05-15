@@ -2,15 +2,15 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  */
 
-package org.yourcompany.smartcity;
+package dev.kiretori.smartcity;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.yourcompany.smartcity.consumers.Consumer;
-import org.yourcompany.smartcity.producers.EnergyProducer;
-import org.yourcompany.smartcity.producers.TrafficProducer;
-import org.yourcompany.smartcity.producers.WasteBinProducer;
-import org.yourcompany.smartcity.producers.WaterProducer;
+import dev.kiretori.smartcity.consumers.Consumer;
+import dev.kiretori.smartcity.producers.EnergyProducer;
+import dev.kiretori.smartcity.producers.TrafficProducer;
+import dev.kiretori.smartcity.producers.WasteBinProducer;
+import dev.kiretori.smartcity.producers.WaterProducer;
 
 /**
  *

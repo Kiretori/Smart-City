@@ -1,4 +1,4 @@
-package org.yourcompany.smartcity.producers;
+package dev.kiretori.smartcity.producers;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
