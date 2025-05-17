@@ -1,8 +1,6 @@
 package dev.kiretori.smartcity.consumers;
 
-
 import java.time.Duration;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Properties;
 
@@ -12,45 +10,20 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
 import com.influxdb.client.InfluxDBClient;
-import com.influxdb.client.InfluxDBClientFactory;
-import com.influxdb.client.WriteApiBlocking;
 
-public class Consumer implements Runnable{
+public abstract class BaseConsumer {
 
     protected String topic;
-    private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+    protected InfluxDBClient influxDBClient;
 
-    public Consumer(String topic) {
+    public BaseConsumer(String topic) {
         this.topic = topic;
     }
 
-    public InfluxDBClient getInfluxDbClient() {
-        String bucket;
-        String org = "docs";
-        char[] token = "admintoken".toCharArray();
-        switch (topic) {
-            case "waste", "test-waste" -> {
-                bucket = "waste_data";
-            }
-            case "water", "test-water" -> {
-                bucket = "water_data";
-            }
-            case "traffic", "test-traffic" -> {
-                bucket = "traffic_data";
-            }
-            case "energy", "test-energy" -> {
-                bucket = "energy_data";
-            }
-            default -> {
-                bucket = "water_data";
-            }
-        }
-        return InfluxDBClientFactory.create("http://localhost:8086", token, org, bucket);
-    }
+    protected abstract void sendDataToInflux(ConsumerRecord<String, String> records);
 
-    @Override
-    public void run() {
+    public void consumeData() {
         // Set up the consumer configuration
         Properties props = new Properties();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
@@ -69,16 +42,12 @@ public class Consumer implements Runnable{
 
         // Poll for new messages
         System.out.println("Waiting for messages...");
-
-        InfluxDBClient influxDBClient = getInfluxDbClient();
-        WriteApiBlocking writeApi = influxDBClient.getWriteApiBlocking();
-        // TODO: Inheritance to add multiple consumers because writing to influxDB is different for each type of sensor
+        
         while (true) {
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(1000));
 
             for (ConsumerRecord<String, String> record : records) {
-                System.out.printf("Received message: key=%s,\n value=%s,\n partition=%d,\n offset=%d%n",
-                        record.key(), record.value(), record.partition(), record.offset());
+                sendDataToInflux(record);
             }
         }
     }

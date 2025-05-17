@@ -6,7 +6,10 @@ package dev.kiretori.smartcity;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.kiretori.smartcity.consumers.Consumer;
+import com.influxdb.client.InfluxDBClient;
+
+import dev.kiretori.smartcity.consumers.WaterConsumer;
+import dev.kiretori.smartcity.influx.InfluxDBService;
 import dev.kiretori.smartcity.producers.EnergyProducer;
 import dev.kiretori.smartcity.producers.TrafficProducer;
 import dev.kiretori.smartcity.producers.WasteBinProducer;
@@ -77,8 +80,13 @@ public class Smart_city_maven {
                 }
             }
             case "client" -> {
+
+                String topic = "test-water";
+                
+                InfluxDBClient influxDBClient = InfluxDBService.getInfluxClient(topic);
+
                 System.out.println("Running as client");
-                Thread consumerThread = new Thread(new Consumer("test-energy"));
+                Thread consumerThread = new Thread(new WaterConsumer(topic, influxDBClient));
                 consumerThread.start();
                  try {
                     consumerThread.join();
