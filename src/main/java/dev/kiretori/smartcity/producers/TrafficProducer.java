@@ -87,12 +87,6 @@ public class TrafficProducer extends BaseProducer implements Runnable {
         boolean incidentDetected = random.nextDouble() < 0.02; // 2% chance of incident
         sensorData.put("incidentDetected", incidentDetected);
         
-        if (incidentDetected) {
-            String[] incidentTypes = {"STOPPED_VEHICLE", "WRONG_WAY_DRIVER", "DEBRIS_ON_ROAD", "PEDESTRIAN_ON_ROAD"};
-            sensorData.put("incidentType", incidentTypes[random.nextInt(incidentTypes.length)]);
-            sensorData.put("incidentSeverity", random.nextDouble() < 0.3 ? "HIGH" : "MEDIUM");
-        }
-        
 
         String alarmStatus = "NONE";
         String alarmSeverity = "NONE";

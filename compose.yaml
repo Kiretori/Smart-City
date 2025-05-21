@@ -21,6 +21,17 @@ services:
       - type: volume
         source: influxdb2-config
         target: /etc/influxdb2
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - 3000:3000
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    depends_on:
+      - influxdb2
 secrets:
   influxdb2-admin-username:
     file: /home/wassim/.env.influxdb2-admin-username
@@ -31,3 +42,4 @@ secrets:
 volumes:
   influxdb2-data:
   influxdb2-config:
+  grafana-storage:

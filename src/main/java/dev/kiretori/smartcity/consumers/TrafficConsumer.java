@@ -13,13 +13,13 @@ import com.influxdb.client.WriteApiBlocking;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
 
-public class WaterConsumer extends BaseConsumer implements Runnable {
+public class TrafficConsumer extends BaseConsumer implements Runnable {
 
     private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     ObjectMapper mapper = new ObjectMapper();
 
-    public WaterConsumer(String topic, InfluxDBClient influxDBClient) {
+    public TrafficConsumer(String topic, InfluxDBClient influxDBClient) {
         super(topic);
         this.influxDBClient = influxDBClient;
     }
@@ -32,31 +32,33 @@ public class WaterConsumer extends BaseConsumer implements Runnable {
     @Override
     protected void sendDataToInflux(ConsumerRecord<String, String> records) {
         WriteApiBlocking writeApi = influxDBClient.getWriteApiBlocking();
-        Map<String, Object> waterData;
+        Map<String, Object> trafficData;
         try {
-            waterData = mapper.readValue(records.value(), Map.class);
+            trafficData = mapper.readValue(records.value(), Map.class);
         } catch (JsonProcessingException ex) {
             System.err.println("Error parsing the json");
             return;
         }
 
-        LocalDateTime localDateTime = LocalDateTime.parse((String) waterData.get("timestamp"), dtf);
+        LocalDateTime localDateTime = LocalDateTime.parse((String) trafficData.get("timestamp"), dtf);
         java.time.Instant instant = localDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant();
 
         try {
 
             Point point = Point.measurement(topic)
-                    .addTag("sensor_id", (String) waterData.get("sensorId"))
-                    .addTag("type", (String) waterData.get("type"))
-                    .addField("flowRate", (Double) waterData.get("flowRate"))
-                    .addField("totalVolume", (Double) waterData.get("totalVolume"))
-                    .addField("leakDetected", (boolean) waterData.get("leakDetected"))
-                    .addField("alarmStatus", (String) waterData.get("alarmStatus"))
-                    .addField("alarmSeverity", (String) waterData.get("alarmSeverity"))
+                    .addTag("sensor_id", (String) trafficData.get("sensorId"))
+                    .addTag("type", (String) trafficData.get("type"))
+                    .addField("vehiclesPerMinute", (int) trafficData.get("vehiclesPerMinute"))
+                    .addField("averageSpeed", (Double) trafficData.get("averageSpeed"))
+                    .addField("queueLength", (int) trafficData.get("queueLength"))
+                    .addField("queueLengthMeters", (Double) trafficData.get("queueLengthMeters"))
+                    .addField("incidentDetected", (Boolean) trafficData.get("incidentDetected"))
+                    .addField("alarmStatus", (String) trafficData.get("alarmStatus"))
+                    .addField("alarmSeverity", (String) trafficData.get("alarmSeverity"))
                     .time(instant, WritePrecision.S);
 
             writeApi.writePoint(point);
-            System.out.println("Water data sent to influxDB");
+            System.out.println("Traffic data sent to influxDB");
         } catch (NumberFormatException e) {
             System.err.println("Invalid number format");
         }
