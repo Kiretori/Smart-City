@@ -98,7 +98,7 @@ public class WaterProducer extends BaseProducer implements Runnable{
         sensorData.put("waterPressure", waterPressure);
         sensorData.put("waterTemperature", waterTemperature); 
         
-        boolean leakDetected = Math.abs(random.sample()) < 0.05; // 5% chance of leak
+        boolean leakDetected = Math.abs(random.sample()) < 0.01; // 1% chance of leak
         sensorData.put("leakDetected", leakDetected);
         if (leakDetected) {
             sensorData.put("alarmStatus", "LEAK_DETECTED");
