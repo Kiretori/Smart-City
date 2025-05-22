@@ -35,17 +35,8 @@ public class Smart_city_maven {
         }
         switch (mode) {
             case "server" -> {
-                System.out.println("Running as server");
-                if (args.length > 1) {
-                    try {
-                        threadNum = Integer.parseInt(args[1]);
-                        System.out.println("Thread nums " + threadNum);
-                    }
-                    catch (NumberFormatException e) {
-                    }
-                }
                 
-                int totalSensors = threadNum * 4;
+                int totalSensors = 4;
 
                 // Create simulation time manager
                 LocalDateTime simulationStart = LocalDateTime.of(2025, 1, 1, 0, 0, 0);
