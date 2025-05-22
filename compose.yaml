@@ -34,11 +34,11 @@ services:
       - influxdb2
 secrets:
   influxdb2-admin-username:
-    file: /home/wassim/.env.influxdb2-admin-username
+    file: /secrets/influxdb2-admin-username
   influxdb2-admin-password:
-    file: /home/wassim/.env.influxdb2-admin-password
+    file: /secrets/influxdb2-admin-username
   influxdb2-admin-token:
-    file: /home/wassim/.env.influxdb2-admin-token
+    file: /secrets/influxdb2-admin-username
 volumes:
   influxdb2-data:
   influxdb2-config:
