@@ -17,9 +17,12 @@ public class TrafficProducer extends BaseProducer implements Runnable {
     private static final Random random = new Random();
     private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private final SimulationTimeManager timeManager;
 
-    public TrafficProducer() {
+
+    public TrafficProducer(SimulationTimeManager timeManager) {
         this.sensorId = UUID.randomUUID();
+        this.timeManager = timeManager;
     }
 
     public UUID getSensorId() {
@@ -28,13 +31,26 @@ public class TrafficProducer extends BaseProducer implements Runnable {
 
     @Override
     protected String getTopic() {
-        return "test-traffic";
+        return "traffic";
     }
 
     @Override
     public void run() {
-        int x = 5;
-        scheduler.scheduleAtFixedRate(() -> sendData(sensorId), 0, x, TimeUnit.SECONDS); // Send data every x seconds
+        int dataSendInterval = 1; // seconds between data sends
+        
+        scheduler.scheduleAtFixedRate(() -> {
+            try {
+                // Send data
+                sendData(sensorId);
+                
+                // Wait for all other sensors to finish sending their data
+                // Time will advance automatically when all sensors reach this point
+                timeManager.waitForAllSensors();
+                
+            } catch (Exception e) {
+                System.err.println("Error in sensor " + sensorId + ": " + e.getMessage());
+            }
+        }, 0, dataSendInterval, TimeUnit.SECONDS);
     }
 
     @Override
@@ -44,7 +60,7 @@ public class TrafficProducer extends BaseProducer implements Runnable {
         // Basic sensor identification
         sensorData.put("sensorId", sensorId);
         sensorData.put("type", "TRAFFIC");
-        sensorData.put("timestamp", LocalDateTime.now().format(dtf));
+        sensorData.put("timestamp", timeManager.getCurrentTime().format(dtf));
         
         // Time-based traffic patterns
         LocalDateTime now = LocalDateTime.now();
