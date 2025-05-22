@@ -1,4 +1,4 @@
-# Système de Monitoring IoT - Ville Intelligente
+# Système de Monitoring IoT - Smart City
 
 Ce projet implémente un système de surveillance en temps réel pour une ville intelligente, utilisant des capteurs IoT simulés pour collecter des données sur l'énergie, l'eau, les déchets et le trafic.
 
