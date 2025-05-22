@@ -57,7 +57,7 @@ public class EnergyConsumer extends BaseConsumer implements Runnable {
                     .time(instant, WritePrecision.S);
 
             writeApi.writePoint(point);
-            System.out.println("Energy data sent to influxDB");
+            System.out.println("Energy data sent to influxDB to " + topic);
         } catch (NumberFormatException e) {
             System.err.println("Invalid number format");
         }

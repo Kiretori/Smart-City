@@ -5,23 +5,27 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.math3.distribution.NormalDistribution;
 
 
 
 public class WaterProducer extends BaseProducer implements Runnable{
 
     private final UUID sensorId; 
-    private static final Random random = new Random();
+    // private static final Random random = new Random();
+    private static final NormalDistribution random = new NormalDistribution();
     private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private final SimulationTimeManager timeManager;
 
-    public WaterProducer() {
+    public WaterProducer(SimulationTimeManager timeManager) {
         this.sensorId = UUID.randomUUID();
+        this.timeManager = timeManager;
     }
 
     public UUID getSensorId() {
@@ -31,13 +35,26 @@ public class WaterProducer extends BaseProducer implements Runnable{
 
     @Override
     protected String getTopic() {
-        return "test-water";
+        return "water";
     }
 
     @Override
     public void run() {
-        int x = 5;
-        scheduler.scheduleAtFixedRate(() -> sendData(sensorId), 0, x, TimeUnit.SECONDS); // Send data every x seconds
+        int dataSendInterval = 1; // seconds between data sends
+        
+        scheduler.scheduleAtFixedRate(() -> {
+            try {
+                // Send data
+                sendData(sensorId);
+                
+                // Wait for all other sensors to finish sending their data
+                // Time will advance automatically when all sensors reach this point
+                timeManager.waitForAllSensors();
+                
+            } catch (Exception e) {
+                System.err.println("Error in sensor " + sensorId + ": " + e.getMessage());
+            }
+        }, 0, dataSendInterval, TimeUnit.SECONDS);
     }
 
     @Override
@@ -46,7 +63,7 @@ public class WaterProducer extends BaseProducer implements Runnable{
 
         sensorData.put("sensorId", sensorId);
         sensorData.put("type", "Water");
-        LocalDateTime currentDate = LocalDateTime.now();
+        LocalDateTime currentDate = timeManager.getCurrentTime();
         sensorData.put("timestamp", currentDate.format(dtf));
 
         int hour = currentDate.getHour();
@@ -68,19 +85,20 @@ public class WaterProducer extends BaseProducer implements Runnable{
             flowMultiplier *= 1.2; // Weekend boost
         }
 
-        double baseFlow = random.nextDouble() * 30; // L/min, baseline
+        
+        double baseFlow = Math.abs(random.sample()) * 30; // L/min, baseline
         double flowRate = round(baseFlow * flowMultiplier, 2);
-        double totalVolume = round(random.nextDouble() * 10000, 2); // m³
+        double totalVolume = round(Math.abs(random.sample()) * 10000, 2); // m³
 
-        double waterPressure = round(2.5 + random.nextDouble() * 2, 2); // 2.5–4.5 bars
-        double waterTemperature = round(8 + random.nextDouble() * 10, 1); // 8–18°C
+        double waterPressure = round(2.5 + Math.abs(random.sample()) * 2, 2); // 2.5–4.5 bars
+        double waterTemperature = round(8 + Math.abs(random.sample()) * 10, 1); // 8–18°C
 
         sensorData.put("flowRate", flowRate);
         sensorData.put("totalVolume", totalVolume);
         sensorData.put("waterPressure", waterPressure);
         sensorData.put("waterTemperature", waterTemperature); 
         
-        boolean leakDetected = random.nextDouble() < 0.05; // 5% chance of leak
+        boolean leakDetected = Math.abs(random.sample()) < 0.05; // 5% chance of leak
         sensorData.put("leakDetected", leakDetected);
         if (leakDetected) {
             sensorData.put("alarmStatus", "LEAK_DETECTED");
