@@ -124,7 +124,6 @@ Si vous rencontrez des problèmes :
 2. Assurez-vous que les topics Kafka sont créés
 3. Vérifiez les identifiants dans les fichiers secrets
 4. Consultez les logs des conteneurs Docker
+5. Vérifiez que vous utilisez http://influxdb2:8086 comme URL pour la Data Source dans Grafana et non pas http://localhost:8086
 
 ---
-
-**Développé pour le cours de [Nom du Cours] - [Année Scolaire]**
