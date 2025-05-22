@@ -10,13 +10,15 @@ import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import org.apache.commons.math3.distribution.NormalDistribution;
 
 
 
 public class WaterProducer extends BaseProducer implements Runnable{
 
     private final UUID sensorId; 
-    private static final Random random = new Random();
+    // private static final Random random = new Random();
+    private static static final NormalDistribution random = new NormalDistribution();
     private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
@@ -68,19 +70,20 @@ public class WaterProducer extends BaseProducer implements Runnable{
             flowMultiplier *= 1.2; // Weekend boost
         }
 
-        double baseFlow = random.nextDouble() * 30; // L/min, baseline
+        
+        double baseFlow = abs(random.sample()) * 30; // L/min, baseline
         double flowRate = round(baseFlow * flowMultiplier, 2);
-        double totalVolume = round(random.nextDouble() * 10000, 2); // m³
+        double totalVolume = round(abs(random.sample()) * 10000, 2); // m³
 
-        double waterPressure = round(2.5 + random.nextDouble() * 2, 2); // 2.5–4.5 bars
-        double waterTemperature = round(8 + random.nextDouble() * 10, 1); // 8–18°C
+        double waterPressure = round(2.5 + abs(random.sample()) * 2, 2); // 2.5–4.5 bars
+        double waterTemperature = round(8 + abs(random.sample()) * 10, 1); // 8–18°C
 
         sensorData.put("flowRate", flowRate);
         sensorData.put("totalVolume", totalVolume);
         sensorData.put("waterPressure", waterPressure);
         sensorData.put("waterTemperature", waterTemperature); 
         
-        boolean leakDetected = random.nextDouble() < 0.05; // 5% chance of leak
+        boolean leakDetected = abs(random.sample()) < 0.05; // 5% chance of leak
         sensorData.put("leakDetected", leakDetected);
         if (leakDetected) {
             sensorData.put("alarmStatus", "LEAK_DETECTED");
